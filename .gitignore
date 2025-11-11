@@ -1,0 +1,16 @@
+# Node modules
+node_modules/
+
+# Environment files
+.env
+
+# Reports
+mochawesome-report/
+allure-results/
+allure-report/
+
+# OS / IDE junk
+.DS_Store
+
+# Coverage
+coverage/
