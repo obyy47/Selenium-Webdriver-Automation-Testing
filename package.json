@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test_login": "mocha --recursive test/login.test.js --timeout 60000 --reporter mochawesome"
+    "test_firefox": "mocha --recursive test/loginFirefox.test.js --timeout 60000 --reporter mochawesome",
+    "test_chrome": "mocha --recursive test/loginChrome.test.js --timeout 60000 --reporter mochawesome",
+    "smoke_login": "mocha --recursive smoke/login.test.js --timeout 60000 --reporter mochawesome"
   },
   "repository": {
     "type": "git",
