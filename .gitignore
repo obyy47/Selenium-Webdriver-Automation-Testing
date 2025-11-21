@@ -14,3 +14,7 @@ allure-report/
 
 # Coverage
 coverage/
+
+visual/
+ss_chrome/
+ss_firefox/

@@ -5,12 +5,15 @@ import LoginPage from "../POMChrome/LoginPage.js";
 import ProductsPage from "../POMChrome/ProductsPage.js";
 import CartPage from "../POMChrome/CartPage.js";
 import CheckoutPage from "../POMChrome/CheckoutPage.js";
+import Screenshot from "../POMChrome/Screenshot.js";
 
+import { performVisualTest } from "../helpers/visualHelper.js";
 import assert from "assert";
 
-describe("Regression Test Saucedemo dengan POM", () => {
+describe("Saucedemo Regression Tests Chrome", function () {
   let driver;
   let loginPage, productsPage, cartPage, checkoutPage;
+  let ss;
 
   before(async () => {
     driver = await new Builder().forBrowser("chrome").build();
@@ -19,78 +22,108 @@ describe("Regression Test Saucedemo dengan POM", () => {
     productsPage = new ProductsPage(driver);
     cartPage = new CartPage(driver);
     checkoutPage = new CheckoutPage(driver);
+    ss = new Screenshot(driver);
+
+    await loginPage.open();
+    await loginPage.login("standard_user", "secret_sauce");
+
+    await productsPage.waitUntilLoaded();
+
+    const title = await driver.getTitle();
+    assert.strictEqual(title, "Swag Labs");
+
+    await ss.take("01-Login");
+    await performVisualTest(driver, "chrome", "01_Login");
   });
 
   after(async () => {
     if (driver) await driver.quit();
   });
 
-  it("1. Login", async () => {
-    await loginPage.open(); // buka web & tunggu username muncul
-    await loginPage.login("standard_user", "secret_sauce");
-  });
-
-  it("2. Sorting A to Z", async () => {
-    await productsPage.waitUntilLoaded();
+  it("Sorting Name (A to Z)", async () => {
     const value = await productsPage.sortAtoZ();
     assert.strictEqual(value, "az");
+
+    await ss.take("02-AtoZ");
+    await performVisualTest(driver, "chrome", "02_AtoZ");
   });
 
-  it("3. Sorting Z to A", async () => {
+  it("Sorting Name (Z to A)", async () => {
     const value = await productsPage.sortZtoA();
     assert.strictEqual(value, "za");
+
+    await ss.take("03-ZtoA");
+    await performVisualTest(driver, "chrome", "03_ZtoA");
   });
 
-  it("4. Sorting Low to High", async () => {
+  it("Sorting Price (Low to High)", async () => {
     const value = await productsPage.sortLowToHigh();
     assert.strictEqual(value, "lohi");
+
+    await ss.take("04-LowToHigh");
+    await performVisualTest(driver, "chrome", "04_LowToHigh");
   });
 
-  it("5. Sorting High to Low", async () => {
+  it("Sorting Price (High to Low)", async () => {
     const value = await productsPage.sortHighToLow();
     assert.strictEqual(value, "hilo");
+
+    await ss.take("05-HighToLow");
+    await performVisualTest(driver, "chrome", "05_HighToLow");
   });
 
-  it("6. Add 3 products to cart", async () => {
+  it("Add 3 products to cart", async () => {
     await productsPage.fleeceJacketBtn();
     await productsPage.boltTshirtBtn();
     await productsPage.bikeLightBtn();
+
+    await ss.take("06-AddProducts");
+    await performVisualTest(driver, "chrome", "06_AddProducts");
   });
 
-  it("7. Open cart & verify items", async () => {
+  it("Open cart & verify items", async () => {
     await productsPage.openCart();
 
     const names = await cartPage.getAllItemNames();
 
-    assert.ok(
-      names.includes("Sauce Labs Fleece Jacket"),
-      "Fleece Jacket tidak ditemukan!"
-    );
-    assert.ok(
-      names.includes("Sauce Labs Bolt T-Shirt"),
-      "Bolt T-Shirt tidak ditemukan!"
-    );
-    assert.ok(
-      names.includes("Sauce Labs Bike Light"),
-      "Bike Light tidak ditemukan!"
-    );
+    console.log("ITEMS IN CART:", names);
+
+    assert.ok(names.includes("Sauce Labs Fleece Jacket"));
+    assert.ok(names.includes("Sauce Labs Bolt T-Shirt"));
+    assert.ok(names.includes("Sauce Labs Bike Light"));
+
+    await ss.take("07-Cart");
+    await performVisualTest(driver, "chrome", "07_Cart");
   });
 
-  it("8. Click Checkout", async () => {
+  it("Click Checkout", async () => {
     await cartPage.clickCO();
+
+    await ss.take("08-Checkout");
+    await performVisualTest(driver, "chrome", "08_Checkout");
   });
 
-  it("9. Fill checkout form & finish", async () => {
+  it("Fill checkout form & finish", async () => {
     await checkoutPage.fillCustInformation("Robby", "Adriansyah", "040702");
+
     await checkoutPage.continueAndFinishOrder();
+
+    await ss.take("09-InfoFilled");
+    await performVisualTest(driver, "chrome", "09_InfoFilled");
   });
 
-  it("10. Verify Thank You message", async () => {
+  it("Verify Thank You message", async () => {
     const msg = await checkoutPage.getThankYouMessage();
     assert.strictEqual(msg, "Thank you for your order!");
+
+    await ss.take("10-ThankYou");
+    await performVisualTest(driver, "chrome", "10_ThankYou");
   });
 
-  it("11. Back to products", async () => {
+  it("Back to products", async () => {
     await checkoutPage.backToProducts();
+
+    await ss.take("11-BackToProducts");
+    await performVisualTest(driver, "chrome", "11_BackToProducts");
   });
 });
